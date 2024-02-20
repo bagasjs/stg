@@ -1,0 +1,4 @@
+tests/*.out
+
+# For Neovim C/C++ LSP
+compile_flags.txt
