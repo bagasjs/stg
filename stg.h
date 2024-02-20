@@ -3,6 +3,10 @@
 
 #include <stdarg.h> // va_list, va_start, va_end, va_arg
 
+/************************
+ * Platform detection
+ ************************/
+
 #if defined(_WIN32) || defined(__WIN32__)
     #define STG_PLATFORM_WINDOWS
 #elif defined(__ANDROID__)
@@ -13,17 +17,51 @@
     #error "This platform is not supported for Renge Engine, Sorry"
 #endif
 
+#if defined(_MSC_VER)
+    #define STG_COMPILER_MSVC
+#elif defined(__clang__)
+    #define STG_COMPILER_CLANG
+#elif defined(__gcc__)
+    #define STG_COMPILER_GCC
+#else
+    #error "This compiler is not supported"
+#endif
+
+/************************
+ * Common macros
+ ************************/
+
 #ifndef STG_CLITERAL
     #ifdef __cplusplus
         #define STG_CLITERAL(T) T
     #else
         #define STG_CLITERAL(T) (T)
     #endif
-#endif // STG_CLITERAL
+#endif 
+
+#ifndef STG_MIN
+    #define STG_MIN(a, b) (a < b) ? a : b
+#endif 
+
+#ifndef STG_MAX
+    #define STG_MAX(a, b) (a > b) ? a : b
+#endif 
+
+#ifndef STG_BIT
+    #define STG_BIT(pos) (1 << (pos))
+#endif 
+
+#ifndef STG_SIGN
+    #define STG_SIGN(T, a) (((T)(a) > 0) - ((T)(a) < 0))
+#endif 
+
+#ifndef STG_ABS
+    #define STG_ABS(T, a) (STG_SIGN(T, a) * a)
+#endif 
 
 #ifndef STG_CAST
     #define STG_CAST(T, v) ((T)(v))
-#endif // STG_CAST
+#endif 
 
 #ifndef STG_SWAP
     #define STG_SWAP(T, a, b)   \
@@ -32,7 +70,7 @@
             a = b;              \
             b = tmp;            \
         } while(0)
-#endif // STG_SWAP
+#endif 
 
 /************************
  * Common native types 
@@ -188,6 +226,14 @@ stg_size_t stg_strlen(const char *cstr) {
     return i;
 }
 
+void stg_string_format(char *dst, stg_size_t dst_capacity, const char *fmt, ...)
+{
+}
+
+void stg_string_format_v(char *dst, stg_size_t dst_capacity, const char *fmt, va_list ap)
+{
+}
+
 stg_string_view stg_sv_slice(stg_string_view sv, stg_size_t start, stg_size_t end)
 {
     if(end < start) STG_SWAP(stg_size_t, start, end);
@@ -203,6 +249,10 @@ stg_string_view stg_sv_slice(stg_string_view sv, stg_size_t start, stg_size_t en
 /************************
  * Platform dependent API 
  ************************/
+#ifdef STG_PLATFORM_WINDOWS
+
+#endif // STG_PLATFORM_WINDOWS
+
 #ifdef STG_PLATFORM_LINUX
     #include <stdlib.h>
     #include <stdio.h>
@@ -223,6 +273,6 @@ stg_string_view stg_sv_slice(stg_string_view sv, stg_size_t start, stg_size_t en
     void stg_platform_heap_free(void *ptr){
         if(ptr) free(ptr);
     }
-#endif
+#endif // STG_PLATFORM_LINUX
 
 #endif // STG_IMPLEMENTATION
